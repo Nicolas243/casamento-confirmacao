@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração - Confirmações de Casamento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stat-sim .stat-number {
+            color: #27ae60;
+        }
+
+        .stat-nao .stat-number {
+            color: #e74c3c;
+        }
+
+        .stat-total .stat-number {
+            color: #3498db;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .table-container {
+            padding: 0 30px 30px 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-sim {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-nao {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 30px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-group {
+                justify-content: center;
+            }
+
+            .table-container {
+                padding: 0 15px 20px 15px;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Painel Administrativo</h1>
+            <p>Confirmações de Presença - Casamento Nicolas e Julia</p>
+        </div>
+
+        <div class="stats" id="stats-container">
+            <div class="stat-card stat-total">
+                <div class="stat-number" id="total-confirmacoes">-</div>
+                <div class="stat-label">Total de Confirmações</div>
+            </div>
+            <div class="stat-card stat-sim">
+                <div class="stat-number" id="confirmaram-sim">-</div>
+                <div class="stat-label">Confirmaram SIM</div>
+            </div>
+            <div class="stat-card stat-nao">
+                <div class="stat-number" id="confirmaram-nao">-</div>
+                <div class="stat-label">Confirmaram NÃO</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <label for="filtro-status">Filtrar por:</label>
+                <select id="filtro-status" onchange="filtrarConfirmacoes()">
+                    <option value="todos">Todos</option>
+                    <option value="sim">Confirmaram SIM</option>
+                    <option value="nao">Confirmaram NÃO</option>
+                </select>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="carregarConfirmacoes()">
+                    🔄 Atualizar
+                </button>
+                <button class="btn btn-success" onclick="exportarCSV()">
+                    📊 Exportar CSV
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Carregando confirmações...</p>
+            </div>
+
+            <div class="error" id="error-container" style="display: none;">
+                <strong>Erro:</strong> <span id="error-message"></span>
+            </div>
+
+            <div class="empty-state" id="empty-state" style="display: none;">
+                <h3>Nenhuma confirmação encontrada</h3>
+                <p>Ainda não há confirmações de presença registradas.</p>
+            </div>
+
+            <table id="tabela-confirmacoes" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Status</th>
+                        <th>Familiares</th>
+                        <th>Data/Hora</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-confirmacoes">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let confirmacoes = [];
+        let confirmacoesFiltradas = [];
+
+        async function carregarConfirmacoes() {
+            showLoading();
+            hideError();
+
+            try {
+                const response = await fetch('/api/confirmacoes');
+                
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                confirmacoes = data.confirmacoes || [];
+                
+                atualizarEstatisticas(data);
+                filtrarConfirmacoes();
+                
+            } catch (error) {
+                showError(`Erro ao carregar confirmações: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function atualizarEstatisticas(data) {
+            document.getElementById('total-confirmacoes').textContent = data.total || 0;
+            document.getElementById('confirmaram-sim').textContent = data.confirmaram_sim || 0;
+            document.getElementById('confirmaram-nao').textContent = data.confirmaram_nao || 0;
+        }
+
+        function filtrarConfirmacoes() {
+            const filtro = document.getElementById('filtro-status').value;
+            
+            if (filtro === 'todos') {
+                confirmacoesFiltradas = confirmacoes;
+            } else if (filtro === 'sim') {
+                confirmacoesFiltradas = confirmacoes.filter(c => c.vai_comparecer);
+            } else if (filtro === 'nao') {
+                confirmacoesFiltradas = confirmacoes.filter(c => !c.vai_comparecer);
+            }
+
+            renderizarTabela();
+        }
+
+        function renderizarTabela() {
+            const tbody = document.getElementById('tbody-confirmacoes');
+            const tabela = document.getElementById('tabela-confirmacoes');
+            const emptyState = document.getElementById('empty-state');
+
+            if (confirmacoesFiltradas.length === 0) {
+                tabela.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tabela.style.display = 'table';
+
+            tbody.innerHTML = '';
+
+            confirmacoesFiltradas.forEach(confirmacao => {
+                const row = document.createElement('tr');
+                
+                const statusClass = confirmacao.vai_comparecer ? 'status-sim' : 'status-nao';
+                const statusText = confirmacao.vai_comparecer ? 'SIM' : 'NÃO';
+                const familiares = confirmacao.familiares || '-';
+                const dataFormatada = new Date(confirmacao.data_confirmacao).toLocaleString('pt-BR');
+
+                row.innerHTML = `
+                    <td><strong>${confirmacao.nome}</strong></td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>${familiares}</td>
+                    <td>${dataFormatada}</td>
+                    <td>${confirmacao.ip_address || '-'}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function exportarCSV() {
+            if (confirmacoes.length === 0) {
+                alert('Não há dados para exportar.');
+                return;
+            }
+
+            const headers = ['Nome', 'Status', 'Familiares', 'Data/Hora', 'IP'];
+            const csvContent = [
+                headers.join(','),
+                ...confirmacoes.map(c => [
+                    `"${c.nome}"`,
+                    c.vai_comparecer ? 'SIM' : 'NÃO',
+                    `"${c.familiares || ''}"`,
+                    `"${new Date(c.data_confirmacao).toLocaleString('pt-BR')}"`,
+                    c.ip_address || ''
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `confirmacoes_casamento_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('tabela-confirmacoes').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('error-container').style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error-container').style.display = 'none';
+        }
+
+        // Carregar dados ao inicializar a página
+        document.addEventListener('DOMContentLoaded', carregarConfirmacoes);
+
+        // Atualizar automaticamente a cada 30 segundos
+        setInterval(carregarConfirmacoes, 30000);
+    </script>
+</body>
+</html>
+
