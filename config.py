@@ -3,7 +3,7 @@
 # ===== CONFIGURAÇÕES DO WHATSAPP =====
 # Substitua pela URL real do seu grupo do WhatsApp
 # Para obter a URL: Abra o grupo > Três pontos > Convidar via link > Copiar link
-WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/XXXXXXXXXXXXXXX"
+WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/DWuroOdBooEKZYmLqF8O7W"
 
 # ===== CONFIGURAÇÕES DO CASAMENTO =====
 NOME_NOIVOS = "Nicolas e Julia"
@@ -18,7 +18,7 @@ LIMITE_CARACTERES_FAMILIARES = 500
 
 # ===== CONFIGURAÇÕES DE SEGURANÇA =====
 # Chave secreta do Flask (altere para uma chave única em produção)
-SECRET_KEY = "sua_chave_secreta_unica_aqui_2024"
+SECRET_KEY = "nicolas2025julia"
 
 # ===== CONFIGURAÇÕES DE BANCO DE DADOS =====
 # Caminho do banco de dados SQLite
